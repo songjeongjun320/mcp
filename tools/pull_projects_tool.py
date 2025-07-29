@@ -4,9 +4,7 @@ import os
 import json
 from typing import Any
 from supabase import create_client, Client
-from mcp.server.fastmcp import FastMCP
 
-@mcp.tool()
 def pull_projects(organization_id: str, message: str) -> Any:
     """
     Call this tool if user want to check, list up or retrieve detailed information about our projects. It provides all projects's information, names, and descriptions.
