@@ -1,0 +1,81 @@
+# MCP Server Configuration with SSE Transport Mode
+# This configuration file sets up an mcp server with Data structure and
+# algorithm tools to perform DSA operations.
+
+mcp_server:
+  mcp_transport_mode: "sse"
+  mcp_tools:
+    - tool_name: pull_organization
+      tool_description: "Pull organization information from external sources"
+      tool_args:
+        - arg_variable: "org_name"
+          arg_type: string
+          arg_description: "Name of the organization to pull information for"
+        - arg_variable: "include_details"
+          arg_type: boolean
+          arg_description: "Whether to include detailed organization information"
+    
+    - tool_name: pull_projects
+      tool_description: "Pull project information and data from repositories"
+      tool_args:
+        - arg_variable: "project_id"
+          arg_type: string
+          arg_description: "Unique identifier of the project to pull"
+        - arg_variable: "include_files"
+          arg_type: boolean
+          arg_description: "Whether to include project file listings"
+        - arg_variable: "branch"
+          arg_type: string
+          arg_description: "Branch name to pull from (default: main)"
+    
+    - tool_name: pull_documents
+      tool_description: "Pull and retrieve document contents from various sources"
+      tool_args:
+        - arg_variable: "document_path"
+          arg_type: string
+          arg_description: "Path or URL to the document to retrieve"
+        - arg_variable: "format"
+          arg_type: string
+          arg_description: "Expected document format (pdf, docx, txt, etc.)"
+        - arg_variable: "extract_metadata"
+          arg_type: boolean
+          arg_description: "Whether to extract document metadata"
+    
+    - tool_name: mail_to
+      tool_description: "Send email messages to specified recipients"
+      tool_args:
+        - arg_variable: "recipient"
+          arg_type: string
+          arg_description: "Email address of the recipient"
+        - arg_variable: "subject"
+          arg_type: string
+          arg_description: "Subject line of the email"
+        - arg_variable: "body"
+          arg_type: string
+          arg_description: "Email message body content"
+        - arg_variable: "attachment_path"
+          arg_type: string
+          arg_description: "Optional path to file attachment"
+    
+    - tool_name: calculate_sum
+      tool_description: "Calculate the sum of two numbers for testing purposes"
+      tool_args:
+        - arg_variable: "number_a"
+          arg_type: number
+          arg_description: "First number to add"
+        - arg_variable: "number_b"
+          arg_type: number
+          arg_description: "Second number to add"
+    
+    - tool_name: calculate_bmi
+      tool_description: "Calculate BMI (Body Mass Index) based on height and weight"
+      tool_args:
+        - arg_variable: "weight"
+          arg_type: number
+          arg_description: "Weight in kilograms"
+        - arg_variable: "height"
+          arg_type: number
+          arg_description: "Height in meters"
+        - arg_variable: "unit_system"
+          arg_type: string
+          arg_description: "Unit system to use (metric or imperial)"

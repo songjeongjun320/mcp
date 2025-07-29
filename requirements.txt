@@ -1,22 +1,2 @@
-# Core dependencies
-toolbox-core>=0.1.0
-aiohttp>=3.8.0
-asyncio
-
-# Optional dependencies for examples
-langchain>=0.1.0
-langchain-google-vertexai>=0.1.0
-langgraph>=0.0.1
-
-# Development dependencies  
-pytest>=7.0.0
-pytest-asyncio>=0.21.0
-pytest-cov>=4.0.0
-black>=23.0.0
-flake8>=6.0.0
-mypy>=1.0.0
-
-# Google Cloud dependencies (for authentication)
-google-auth>=2.0.0
-google-auth-oauthlib>=1.0.0
-google-cloud-core>=2.0.0 
+mcp
+pyyaml

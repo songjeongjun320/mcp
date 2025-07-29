@@ -1,7 +1,0 @@
-{
-  "mcpServers": {
-    "google-mcp-toolbox": {
-      "url": "http://localhost:5000"
-    }
-  }
-} 
