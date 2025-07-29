@@ -2,9 +2,9 @@
 
 from typing import Any
 
-def pull_documents(api_key: string) -> Any:
+def pull_members(api_key: string) -> Any:
     """
-    Get documents' names, descriptions from database
+    Get member information from projects or organizations
 
     Parameters
     ----------

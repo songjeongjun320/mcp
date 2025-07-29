@@ -1,76 +1,46 @@
-"""Pull projects tool module."""
+"""Auto-generated tool module."""
 
-from typing import Dict, Any, List
-from datetime import datetime
+import os
+from typing import Any
+from supabase import create_client, Client
 
-def pull_projects(project_id: str, include_files: bool = False, branch: str = "main") -> Dict[str, Any]:
+def pull_projects(organization_id: str) -> Any:
     """
-    Pull project information and data from repositories
+    Get projects's information, names, and descriptions from database
 
     Parameters
     ----------
-        project_id (str): Unique identifier of the project to pull
-        include_files (bool): Whether to include project file listings
-        branch (str): Branch name to pull from (default: main)
+        organization_id (str): Unique identifier of the organization to pull project ids from database
 
     Returns
     -------
-    Dict[str, Any]
-        Result containing project information and data.
+    Any
+        Result of the tool.
     """
     try:
-        # Simulate project data (in real implementation, call Git APIs or repositories)
-        project_data = {
-            "id": project_id,
-            "name": f"Project-{project_id}",
-            "description": f"Description for project {project_id}",
-            "branch": branch,
-            "last_commit": {
-                "hash": "a1b2c3d4e5f6",
-                "message": "Update project configuration",
-                "author": "developer@example.com",
-                "timestamp": datetime.now().isoformat()
-            },
-            "language": "Python",
-            "stars": 42,
-            "forks": 8,
-            "contributors": 3,
-            "retrieved_at": datetime.now().isoformat()
-        }
+        # Supabase 클라이언트 생성
+        supabase_url = os.getenv("SUPABASE_URL")
+        supabase_key = os.getenv("SUPABASE_ANON_KEY")
         
-        if include_files:
-            file_structure = [
-                {"path": "README.md", "size": 1024, "type": "file"},
-                {"path": "requirements.txt", "size": 256, "type": "file"},
-                {"path": "src/", "type": "directory"},
-                {"path": "src/main.py", "size": 2048, "type": "file"},
-                {"path": "src/utils.py", "size": 1536, "type": "file"},
-                {"path": "tests/", "type": "directory"},
-                {"path": "tests/test_main.py", "size": 1024, "type": "file"},
-                {"path": ".gitignore", "size": 512, "type": "file"}
-            ]
-            project_data["files"] = file_structure
-            project_data["total_files"] = len([f for f in file_structure if f["type"] == "file"])
+        if not supabase_url or not supabase_key:
+            return {"error": "Supabase credentials not found in environment variables"}
         
-        return {
-            "success": True,
-            "project": project_data,
-            "source": "simulated_repository",
-            "query": {
-                "project_id": project_id,
-                "include_files": include_files,
-                "branch": branch
-            }
-        }
+        supabase: Client = create_client(supabase_url, supabase_key)
         
+        # projects 테이블에서 organization_id로 필터링하여 데이터 가져오기
+        response = supabase.table("projects").select("*").or_(
+            f"organization_id.eq.{organization_id},name.eq.{organization_id},id.eq.{organization_id}"
+        ).execute()
+        
+        if response.data:
+            return {"success": True, "projects": response.data}
+        else:
+            return {"success": False, "message": "No projects found for the given organization_id"}
+            
     except Exception as e:
-        return {
-            "success": False,
-            "error": str(e),
-            "operation": "pull_projects",
-            "inputs": {
-                "project_id": project_id,
-                "include_files": include_files,
-                "branch": branch
-            }
-        }
+        return {"error": f"An error occurred: {str(e)}"}
+
+if __name__ == "__main__":
+    test_org_id = "b5d4ea64-ccf1-4cb6-9236-6e8b239d9097"
+    result = pull_projects(test_org_id)
+    print(f"Result: {result}")
