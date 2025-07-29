@@ -11,6 +11,9 @@ mcp_server:
         - arg_variable: "api_key"
           arg_type: string
           arg_description: "Unique identifier of the organization to pull project ids from database"
+        - arg_variable: "message"
+          arg_type: string
+          arg_description: "user's request message"
     
     - tool_name: pull_documents
       tool_description: "Get documents' names, descriptions from database"
@@ -18,14 +21,20 @@ mcp_server:
         - arg_variable: "api_key"
           arg_type: string
           arg_description: "Unique identifier of the organization to pull project ids and document ids from database"
-    
+        - arg_variable: "message"
+          arg_type: string
+          arg_description: "user's request message"
+
     - tool_name: pull_members
       tool_description: "Get member information from projects or organizations"
       tool_args:
         - arg_variable: "api_key"
           arg_type: string
           arg_description: "Unique identifier of the organization to pull project ids and document ids from database"
-    
+        - arg_variable: "message"
+          arg_type: string
+          arg_description: "user's request message"
+
     - tool_name: mail_to
       tool_description: "Send email messages to specified recipients with attachment support"
       tool_args:
@@ -47,3 +56,6 @@ mcp_server:
         - arg_variable: "body"
           arg_type: string
           arg_description: "body of the email"
+        - arg_variable: "message"
+          arg_type: string
+          arg_description: "user's request message"

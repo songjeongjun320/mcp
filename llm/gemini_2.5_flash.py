@@ -3,6 +3,10 @@
 import os
 import google.generativeai as genai
 from typing import Optional
+from dotenv import load_dotenv
+
+# Load environment variables from .env file in parent directory
+load_dotenv(os.path.join(os.path.dirname(__file__), '..', '.env'))
 
 def llm(question: str, system_prompt: Optional[str] = None) -> str:
     """
@@ -57,7 +61,7 @@ if __name__ == "__main__":
     
     # Test with system prompt
     system_prompt = "You are a helpful AI assistant. Please provide concise and clear answers."
-    test_question2 = "How is the weather today?"
+    test_question2 = "Hi my name is Jun."
     print(f"System prompt: {system_prompt}")
     print(f"Question: {test_question2}")
     response2 = llm(test_question2, system_prompt)

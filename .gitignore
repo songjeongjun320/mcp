@@ -193,3 +193,7 @@ dist/
 # Local configuration overrides
 local_settings.py
 settings_local.py 
+guideline.txt
+
+# json files
+*.json
