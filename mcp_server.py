@@ -14,4 +14,4 @@ mcp.add_tool(pull_members)
 mcp.add_tool(mail_to)
 
 if __name__ == "__main__":
-    mcp.run(transport="sse")
+    mcp.run(transport="stdio")
