@@ -6,7 +6,7 @@ from tools.pull_members_tool import pull_members
 from tools.mail_to_tool import mail_to
 from mcp.server.fastmcp import FastMCP
 
-mcp = FastMCP("Demo")
+mcp = FastMCP("AtomsMCP")
 
 mcp.add_tool(pull_projects)
 mcp.add_tool(pull_documents)
