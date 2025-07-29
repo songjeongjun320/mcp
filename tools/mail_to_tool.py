@@ -1,6 +1,7 @@
 """Auto-generated tool module."""
 
 from typing import Any
+from mcp.server.fastmcp import FastMCP
 
 def mail_to(api_key: str, sender: str, recipient: str, recipient_email: str, subject: str, body: str, message: str) -> Any:
     """

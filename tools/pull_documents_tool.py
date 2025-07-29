@@ -1,6 +1,7 @@
 """Auto-generated tool module."""
 
 from typing import Any
+from mcp.server.fastmcp import FastMCP
 
 def pull_documents(api_key: str, message: str) -> Any:
     """

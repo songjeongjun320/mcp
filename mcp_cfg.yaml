@@ -6,9 +6,9 @@ mcp_server:
   mcp_transport_mode: "sse"
   mcp_tools:
     - tool_name: pull_projects
-      tool_description: "Get projects's information, names, and descriptions from database"
+      tool_description: "Call this tool if user want to check, list up or retrieve detailed information about our projects. It provides all projects's information, names, and descriptions."
       tool_args:
-        - arg_variable: "api_key"
+        - arg_variable: "organization_id"
           arg_type: string
           arg_description: "Unique identifier of the organization to pull project ids from database"
         - arg_variable: "message"
@@ -18,7 +18,7 @@ mcp_server:
     - tool_name: pull_documents
       tool_description: "Get documents' names, descriptions from database"
       tool_args:
-        - arg_variable: "api_key"
+        - arg_variable: "organization_id"
           arg_type: string
           arg_description: "Unique identifier of the organization to pull project ids and document ids from database"
         - arg_variable: "message"
@@ -28,7 +28,7 @@ mcp_server:
     - tool_name: pull_members
       tool_description: "Get member information from projects or organizations"
       tool_args:
-        - arg_variable: "api_key"
+        - arg_variable: "organization_id"
           arg_type: string
           arg_description: "Unique identifier of the organization to pull project ids and document ids from database"
         - arg_variable: "message"
@@ -38,7 +38,7 @@ mcp_server:
     - tool_name: mail_to
       tool_description: "Send email messages to specified recipients with attachment support"
       tool_args:
-        - arg_variable: "api_key"
+        - arg_variable: "organization_id"
           arg_type: string
           arg_description: "Unique identifier of the organization to pull project ids and document ids from database"
         - arg_variable: "sender"

@@ -4,11 +4,13 @@ import os
 import json
 from typing import Any
 from supabase import create_client, Client
+from mcp.server.fastmcp import FastMCP
 
+@mcp.tool()
 def pull_projects(organization_id: str, message: str) -> Any:
     """
-    Get projects's information, names, and descriptions from database
-
+    Call this tool if user want to check, list up or retrieve detailed information about our projects. It provides all projects's information, names, and descriptions.
+    
     Parameters
     ----------
         organization_id (str): Unique identifier of the organization to pull project ids from database
@@ -20,7 +22,7 @@ def pull_projects(organization_id: str, message: str) -> Any:
         Result of the tool.
     """
     try:
-        # Supabase 클라이언트 생성
+        # Create Supabase client
         supabase_url = os.getenv("SUPABASE_URL")
         supabase_key = os.getenv("SUPABASE_ANON_KEY")
         
@@ -29,7 +31,7 @@ def pull_projects(organization_id: str, message: str) -> Any:
         
         supabase: Client = create_client(supabase_url, supabase_key)
         
-        # projects 테이블에서 organization_id로 필터링하여 데이터 가져오기
+        # Filter data from projects table by organization_id
         response = supabase.table("projects").select("*").or_(
             f"organization_id.eq.{organization_id},name.eq.{organization_id},id.eq.{organization_id}"
         ).execute()
