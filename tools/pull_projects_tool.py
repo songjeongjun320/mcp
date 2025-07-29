@@ -66,7 +66,7 @@ def pull_projects(organization_id: str, message: str) -> Any:
             
             # Save result to JSON file
             with open("pull_projects_tool.json", "w", encoding="utf-8") as f:
-                json.dump(result, f, ensure_ascii=False, indent=2)
+                json.dump(result, f, ensure_ascii=False, indent=4)
             
             return result
             
