@@ -85,8 +85,10 @@ def mail_to(organization_id: str, message: str):
         Result of the tool.
     """
     return mail_to_tool(organization_id, message)
+    
+port = int(os.environ.get("PORT", 10000))
 
-mcp = FastMCP("AtomsMCP")
+mcp = FastMCP("AtomsMCP", host="0.0.0.0", port=port)
 
 mcp.add_tool(pull_projects)
 mcp.add_tool(pull_documents)
@@ -94,14 +96,5 @@ mcp.add_tool(pull_members)
 mcp.add_tool(mail_to)
 
 if __name__ == "__main__":
-    # Get port from environment variable (Render sets this automatically)
-    port = int(os.environ.get("PORT", 8000))
-    
     print(f"Starting MCP server on 0.0.0.0:{port}")
-    
-    # Force environment variables for uvicorn
-    os.environ["HOST"] = "0.0.0.0"
-    os.environ["PORT"] = str(port)
-    
-    # Run the MCP server normally - it should pick up the environment variables
     mcp.run(transport="sse")
