@@ -14,6 +14,34 @@ load_dotenv()
 organization_id = os.environ.get("organization_id")
 message = os.environ.get("message")
 
+# Helper function to clean up technical fields
+def clean_result(result):
+    """Remove technical fields like IDs from the result"""
+    if isinstance(result, dict) and "json" in result:
+        # Remove top-level technical fields
+        technical_fields = ["project_ids", "user_ids", "document_ids", "id"]
+        for field in technical_fields:
+            if field in result["json"]:
+                del result["json"][field]
+        
+        # Recursively clean nested structures
+        _clean_nested_ids(result["json"])
+    
+    return result
+
+def _clean_nested_ids(data):
+    """Recursively remove id fields from nested data structures"""
+    if isinstance(data, list):
+        for item in data:
+            _clean_nested_ids(item)
+    elif isinstance(data, dict):
+        # Remove id fields
+        if "id" in data:
+            del data["id"]
+        # Continue cleaning nested structures
+        for value in data.values():
+            _clean_nested_ids(value)
+
 # organization_id를 고정으로 사용하는 래퍼 함수들
 def pull_projects(organization_id: str, message: str) -> Any:
     """
@@ -32,13 +60,7 @@ def pull_projects(organization_id: str, message: str) -> Any:
     print("organization_id: ", organization_id)
     print("message: ", message)
     result = pull_projects_tool(organization_id, message)
-    
-    # Remove project_ids from the result before returning
-    if isinstance(result, dict) and "json" in result:
-        if "project_ids" in result["json"]:
-            del result["json"]["project_ids"]
-    
-    return result
+    return clean_result(result)
 
 def pull_documents(organization_id: str, message: str) -> Any:
     """
@@ -71,13 +93,7 @@ def pull_members(organization_id: str, message: str) -> Any:
         Result of the tool.
     """    
     result = pull_members_tool(organization_id, message)
-    
-    # Remove user_ids from the result before returning
-    if isinstance(result, dict) and "json" in result:
-        if "user_ids" in result["json"]:
-            del result["json"]["user_ids"]
-    
-    return result
+    return clean_result(result)
 
 def mail_to(organization_id: str, message: str):
     """
