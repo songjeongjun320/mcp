@@ -1,4 +1,4 @@
-"""Auto-generated tool module."""
+"""pull projects tool module"""
 
 import json
 import sys

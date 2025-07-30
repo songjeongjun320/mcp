@@ -39,7 +39,7 @@ def pull_documents(organization_id: str, message: str) -> Any:
 
     Parameters
     ----------
-        api_key (str): Unique identifier of the organization to pull project ids and document ids from database
+        organization_id (str): Unique identifier of the organization to pull project ids and document ids from database
         message (str): user's request message
 
     Returns
@@ -55,7 +55,7 @@ def pull_members(organization_id: str, message: str) -> Any:
 
     Parameters
     ----------
-        api_key (str): Unique identifier of the organization to pull project ids and document ids from database
+        organization_id (str): Unique identifier of the organization to pull project ids and document ids from database
         message (str): user's request message
 
     Returns
@@ -71,7 +71,7 @@ def mail_to(organization_id: str, message: str):
 
     Parameters
     ----------
-        api_key (str): Unique identifier of the organization to pull project ids and document ids from database
+        organization_id (str): Unique identifier of the organization to pull project ids and document ids from database
         sender (str): name of the sender
         recipient (str): name of the recipient
         recipient_email (str): recipient's email address
