@@ -85,5 +85,5 @@ def pull_projects_tool(organization_id: str, message: str) -> Any:
 if __name__ == "__main__":
     test_org_id = "b5d4ea64-ccf1-4cb6-9236-6e8b239d9097"
     test_message = "List up all projects"
-    result = pull_projects(test_org_id, test_message)
+    result = pull_projects_tool(test_org_id, test_message)
     print(f"Result: {result}")
