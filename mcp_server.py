@@ -97,5 +97,11 @@ if __name__ == "__main__":
     # Get port from environment variable (Render sets this automatically)
     port = int(os.environ.get("PORT", 8000))
     
-    # For deployment, use host 0.0.0.0 to bind to all interfaces
-    mcp.run(transport="sse", host="0.0.0.0", port=port)
+    print(f"Starting MCP server on 0.0.0.0:{port}")
+    
+    # Force environment variables for uvicorn
+    os.environ["HOST"] = "0.0.0.0"
+    os.environ["PORT"] = str(port)
+    
+    # Run the MCP server normally - it should pick up the environment variables
+    mcp.run(transport="sse")
