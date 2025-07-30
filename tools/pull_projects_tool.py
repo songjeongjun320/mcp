@@ -1,13 +1,13 @@
 """Auto-generated tool module."""
 
-import os
 import json
+import sys
+import os
 from typing import Any
-from supabase import create_client, Client
-from dotenv import load_dotenv
 
-# Load environment variables from .env file
-load_dotenv()
+# Add parent directory to sys.path to import local supabase module
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+from supabase_client.client import get_supabase_client
 
 def pull_projects_tool(organization_id: str, message: str) -> Any:
     print(f"[pull_projects] Starting with organization_id: {organization_id}")
@@ -15,16 +15,8 @@ def pull_projects_tool(organization_id: str, message: str) -> Any:
     
     try:
         # Create Supabase client
-        print("[pull_projects] Loading Supabase credentials...")
-        supabase_url = os.getenv("SUPABASE_URL")
-        supabase_key = os.getenv("SUPABASE_ANON_KEY")
-        
-        if not supabase_url or not supabase_key:
-            print("[pull_projects] ERROR: Supabase credentials not found")
-            return {"error": "Supabase credentials not found in environment variables"}
-        
-        print(f"[pull_projects] Connecting to Supabase URL: {supabase_url[:30]}...")
-        supabase: Client = create_client(supabase_url, supabase_key)
+        print("[pull_projects] Creating Supabase client...")
+        supabase = get_supabase_client()
         
         # Filter data from projects table by organization_id
         print(f"[pull_projects] Querying projects table for organization_id: {organization_id}")
@@ -78,6 +70,9 @@ def pull_projects_tool(organization_id: str, message: str) -> Any:
             print("[pull_projects] COMPLETED: No projects found")
             return result
             
+    except ValueError as e:
+        print(f"[pull_projects] ERROR: {str(e)}")
+        return {"error": str(e)}
     except Exception as e:
         print(f"[pull_projects] ERROR: Exception occurred - {str(e)}")
         return {"error": f"An error occurred: {str(e)}"}

@@ -5,6 +5,6 @@ from dotenv import load_dotenv
 
 # Load environment variables from .env file
 load_dotenv()
-def pull_members_tool(api_key: str, message: str) -> Any:
+def pull_members_tool(organization_id: str, message: str) -> Any:
     # TODO: implement tool logic
     raise NotImplementedError
