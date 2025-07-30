@@ -4,41 +4,44 @@ import os
 import json
 from typing import Any
 from supabase import create_client, Client
+from dotenv import load_dotenv
 
-def pull_projects(organization_id: str, message: str) -> Any:
-    """
-    Call this tool if user want to check, list up or retrieve detailed information about our projects. It provides all projects's information, names, and descriptions.
+# Load environment variables from .env file
+load_dotenv()
+
+def pull_projects_tool(organization_id: str, message: str) -> Any:
+    print(f"[pull_projects] Starting with organization_id: {organization_id}")
+    print(f"[pull_projects] Message: {message}")
     
-    Parameters
-    ----------
-        organization_id (str): Unique identifier of the organization to pull project ids from database
-        message (str): user's request message
-
-    Returns
-    -------
-    Any
-        Result of the tool.
-    """
     try:
         # Create Supabase client
+        print("[pull_projects] Loading Supabase credentials...")
         supabase_url = os.getenv("SUPABASE_URL")
         supabase_key = os.getenv("SUPABASE_ANON_KEY")
         
         if not supabase_url or not supabase_key:
+            print("[pull_projects] ERROR: Supabase credentials not found")
             return {"error": "Supabase credentials not found in environment variables"}
         
+        print(f"[pull_projects] Connecting to Supabase URL: {supabase_url[:30]}...")
         supabase: Client = create_client(supabase_url, supabase_key)
         
         # Filter data from projects table by organization_id
+        print(f"[pull_projects] Querying projects table for organization_id: {organization_id}")
         response = supabase.table("projects").select("*").or_(
             f"organization_id.eq.{organization_id},name.eq.{organization_id},id.eq.{organization_id}"
         ).execute()
         
+        print(f"[pull_projects] Query executed. Found {len(response.data)} projects")
+        
         if response.data:
+            print("[pull_projects] Processing project data...")
             # Extract required information from response.data
             project_ids = [project.get("id", "") for project in response.data]
             project_names = [project.get("name", "") for project in response.data]
             project_descriptions = [project.get("description", "") for project in response.data]
+            
+            print(f"[pull_projects] Extracted {len(project_ids)} project IDs")
             
             result = {
                 "json": {
@@ -50,11 +53,14 @@ def pull_projects(organization_id: str, message: str) -> Any:
             }
             
             # Save result to JSON file
+            print("[pull_projects] Saving result to JSON file...")
             with open("pull_projects_tool.json", "w", encoding="utf-8") as f:
                 json.dump(result, f, ensure_ascii=False, indent=2)
             
+            print("[pull_projects] SUCCESS: Completed successfully")
             return result
         else:
+            print("[pull_projects] No projects found for the given organization_id")
             result = {
                 "json": {
                     "project_ids": [],
@@ -65,12 +71,15 @@ def pull_projects(organization_id: str, message: str) -> Any:
             }
             
             # Save result to JSON file
+            print("[pull_projects] Saving empty result to JSON file...")
             with open("pull_projects_tool.json", "w", encoding="utf-8") as f:
                 json.dump(result, f, ensure_ascii=False, indent=4)
             
+            print("[pull_projects] COMPLETED: No projects found")
             return result
             
     except Exception as e:
+        print(f"[pull_projects] ERROR: Exception occurred - {str(e)}")
         return {"error": f"An error occurred: {str(e)}"}
 
 if __name__ == "__main__":
