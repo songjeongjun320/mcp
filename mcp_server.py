@@ -70,7 +70,14 @@ def pull_members(organization_id: str, message: str) -> Any:
     Any
         Result of the tool.
     """    
-    return pull_members_tool(organization_id, message)
+    result = pull_members_tool(organization_id, message)
+    
+    # Remove user_ids from the result before returning
+    if isinstance(result, dict) and "json" in result:
+        if "user_ids" in result["json"]:
+            del result["json"]["user_ids"]
+    
+    return result
 
 def mail_to(organization_id: str, message: str):
     """
