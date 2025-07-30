@@ -9,7 +9,7 @@ from typing import Any
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from supabase_client.client import get_supabase_client
 
-def mail_to_tool(api_key: str, sender: str, recipient: str, recipient_email: str, subject: str, body: str, message: str) -> Any:
+def mail_to_tool(organization_id: str, sender: str, recipient: str, recipient_email: str, subject: str, body: str, message: str) -> Any:
     print(f"[mail_to] Starting with organization_id: {organization_id}")
     print(f"[mail_to] Message: {message}")
     

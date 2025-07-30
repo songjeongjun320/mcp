@@ -17,7 +17,7 @@ message = os.environ.get("message")
 # organization_id를 고정으로 사용하는 래퍼 함수들
 def pull_projects(organization_id: str, message: str) -> Any:
     """
-    Call this tool if user want to check, list up or retrieve detailed information about our projects. It provides all projects's information, names, and descriptions.
+    Call tool if user want to check, list up or retrieve detailed information about our projects. It provides all projects's information, names, and descriptions.
     
     Parameters
     ----------
@@ -31,11 +31,18 @@ def pull_projects(organization_id: str, message: str) -> Any:
     """
     print("organization_id: ", organization_id)
     print("message: ", message)
-    return pull_projects_tool(organization_id, message)
+    result = pull_projects_tool(organization_id, message)
+    
+    # Remove project_ids from the result before returning
+    if isinstance(result, dict) and "json" in result:
+        if "project_ids" in result["json"]:
+            del result["json"]["project_ids"]
+    
+    return result
 
 def pull_documents(organization_id: str, message: str) -> Any:
     """
-    Get documents' names, descriptions from database
+    If user wants to get documents' names, descriptions from database
 
     Parameters
     ----------
@@ -51,7 +58,7 @@ def pull_documents(organization_id: str, message: str) -> Any:
 
 def pull_members(organization_id: str, message: str) -> Any:
     """
-    Get member information from projects or organizations
+    If user wants to get member information from projects or organizations
 
     Parameters
     ----------
@@ -67,7 +74,7 @@ def pull_members(organization_id: str, message: str) -> Any:
 
 def mail_to(organization_id: str, message: str):
     """
-    Send email messages to specified recipients with attachment support
+    If user wants to send email messages to specified recipients with attachment support
 
     Parameters
     ----------
@@ -93,7 +100,7 @@ mcp = FastMCP("AtomsMCP", host="0.0.0.0", port=port)
 mcp.add_tool(pull_projects)
 mcp.add_tool(pull_documents)
 mcp.add_tool(pull_members)
-mcp.add_tool(mail_to)
+# mcp.add_tool(mail_to)
 
 if __name__ == "__main__":
     print(f"Starting MCP server on 0.0.0.0:{port}")
