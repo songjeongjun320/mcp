@@ -94,4 +94,8 @@ mcp.add_tool(pull_members)
 mcp.add_tool(mail_to)
 
 if __name__ == "__main__":
-    mcp.run(transport="sse")
+    # Get port from environment variable (Render sets this automatically)
+    port = int(os.environ.get("PORT", 8000))
+    
+    # For deployment, use host 0.0.0.0 to bind to all interfaces
+    mcp.run(transport="sse", host="0.0.0.0", port=port)
