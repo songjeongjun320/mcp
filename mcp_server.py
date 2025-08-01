@@ -128,7 +128,7 @@ def get_documents_by_projects(organization_id: str, message: str) -> Any:
 
     Parameters
     ----------
-        organization_id (str): Unique identifier of the organization. You can find this organization_id in the mcp.json.
+        organization_id (str): You can find this organization_id in the mcp.json.
         message (str): User's request message containing project specifications
 
     Returns
@@ -145,7 +145,7 @@ def task_assign(organization_id: str, message: str) -> Any:
 
     Parameters
     ----------
-        organization_id (str): Unique identifier of the organization. You can find this organization_id in the mcp.json.
+        organization_id (str): You can find this organization_id in the mcp.json.
         message (str): User's request message for task assignment information
 
     Returns
@@ -162,7 +162,7 @@ def analyze_doc(organization_id: str, message: str) -> Any:
 
     Parameters
     ----------
-        organization_id (str): Unique identifier of the organization. You can find this organization_id in the mcp.json.
+        organization_id (str): You can find this organization_id in the mcp.json.
         message (str): User's request message specifying which document to analyze
 
     Returns
@@ -179,7 +179,7 @@ def get_project_issues(organization_id: str, message: str) -> Any:
 
     Parameters
     ----------
-        organization_id (str): Unique identifier of the organization. You can find this organization_id in the mcp.json.
+        organization_id (str): You can find this organization_id in the mcp.json.
         message (str): User's request message for project issues information
 
     Returns
@@ -196,7 +196,7 @@ def progress_reporting(organization_id: str, message: str) -> Any:
 
     Parameters
     ----------
-        organization_id (str): Unique identifier of the organization. You can find this organization_id in the mcp.json.
+        organization_id (str): You can find this organization_id in the mcp.json.
         message (str): User's request message for progress reporting
 
     Returns
@@ -213,7 +213,7 @@ def milestone_tracking(organization_id: str, message: str) -> Any:
 
     Parameters
     ----------
-        organization_id (str): Unique identifier of the organization. You can find this organization_id in the mcp.json.
+        organization_id (str): You can find this organization_id in the mcp.json.
         message (str): User's request message for milestone tracking
 
     Returns
