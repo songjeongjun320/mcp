@@ -55,7 +55,7 @@ def pull_projects(organization_id: str, message: str) -> Any:
     
     Parameters
     ----------
-        organization_id (str): Unique identifier of the organization to pull project ids from database
+        organization_id (str): Unique identifier of the organization to pull project ids from database. You can find this organization_id in the mcp.json.
         message (str): user's request message
 
     Returns
@@ -74,7 +74,7 @@ def pull_documents(organization_id: str, message: str) -> Any:
 
     Parameters
     ----------
-        organization_id (str): Unique identifier of the organization to pull project ids and document ids from database
+        organization_id (str): Unique identifier of the organization to pull project ids and document ids from database. You can find this organization_id in the mcp.json.
         message (str): user's request message
 
     Returns
@@ -90,7 +90,7 @@ def pull_members(organization_id: str, message: str) -> Any:
 
     Parameters
     ----------
-        organization_id (str): Unique identifier of the organization to pull project ids and document ids from database
+        organization_id (str): Unique identifier of the organization to pull project ids and document ids from database. You can find this organization_id in the mcp.json.
         message (str): user's request message
 
     Returns
@@ -107,7 +107,7 @@ def mail_to(organization_id: str, message: str):
 
     Parameters
     ----------
-        organization_id (str): Unique identifier of the organization to pull project ids and document ids from database
+        organization_id (str): Unique identifier of the organization to pull project ids and document ids from database. You can find this organization_id in the mcp.json.
         sender (str): name of the sender
         recipient (str): name of the recipient
         recipient_email (str): recipient's email address
@@ -128,7 +128,7 @@ def get_documents_by_projects(organization_id: str, message: str) -> Any:
 
     Parameters
     ----------
-        organization_id (str): Unique identifier of the organization
+        organization_id (str): Unique identifier of the organization. You can find this organization_id in the mcp.json.
         message (str): User's request message containing project specifications
 
     Returns
@@ -145,7 +145,7 @@ def task_assign(organization_id: str, message: str) -> Any:
 
     Parameters
     ----------
-        organization_id (str): Unique identifier of the organization
+        organization_id (str): Unique identifier of the organization. You can find this organization_id in the mcp.json.
         message (str): User's request message for task assignment information
 
     Returns
@@ -162,7 +162,7 @@ def analyze_doc(organization_id: str, message: str) -> Any:
 
     Parameters
     ----------
-        organization_id (str): Unique identifier of the organization
+        organization_id (str): Unique identifier of the organization. You can find this organization_id in the mcp.json.
         message (str): User's request message specifying which document to analyze
 
     Returns
@@ -179,7 +179,7 @@ def get_project_issues(organization_id: str, message: str) -> Any:
 
     Parameters
     ----------
-        organization_id (str): Unique identifier of the organization
+        organization_id (str): Unique identifier of the organization. You can find this organization_id in the mcp.json.
         message (str): User's request message for project issues information
 
     Returns
@@ -196,7 +196,7 @@ def progress_reporting(organization_id: str, message: str) -> Any:
 
     Parameters
     ----------
-        organization_id (str): Unique identifier of the organization
+        organization_id (str): Unique identifier of the organization. You can find this organization_id in the mcp.json.
         message (str): User's request message for progress reporting
 
     Returns
@@ -213,7 +213,7 @@ def milestone_tracking(organization_id: str, message: str) -> Any:
 
     Parameters
     ----------
-        organization_id (str): Unique identifier of the organization
+        organization_id (str): Unique identifier of the organization. You can find this organization_id in the mcp.json.
         message (str): User's request message for milestone tracking
 
     Returns
