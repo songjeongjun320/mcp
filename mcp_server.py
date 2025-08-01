@@ -5,6 +5,12 @@ from tools.pull_projects_tool import pull_projects_tool
 from tools.pull_documents_tool import pull_documents_tool
 from tools.pull_members_tool import pull_members_tool
 from tools.mail_to_tool import mail_to_tool
+from tools.get_documents_by_projects_tool import get_documents_by_projects_tool
+from tools.task_assign_tool import task_assign_tool
+from tools.analyze_doc_tool import analyze_doc_tool
+from tools.get_project_issues_tool import get_project_issues_tool
+from tools.progress_reporting_tool import progress_reporting_tool
+from tools.milestone_tracking_tool import milestone_tracking_tool
 from mcp.server.fastmcp import FastMCP
 from dotenv import load_dotenv
 
@@ -115,6 +121,108 @@ def mail_to(organization_id: str, message: str):
         Result of the tool.
     """
     return mail_to_tool(organization_id, message)
+
+def get_documents_by_projects(organization_id: str, message: str) -> Any:
+    """
+    Get documents from specific projects within an organization
+
+    Parameters
+    ----------
+        organization_id (str): Unique identifier of the organization
+        message (str): User's request message containing project specifications
+
+    Returns
+    -------
+    Any
+        Structured result containing documents from specified projects
+    """
+    result = get_documents_by_projects_tool(organization_id, message)
+    return clean_result(result)
+
+def task_assign(organization_id: str, message: str) -> Any:
+    """
+    Retrieve task assignments for team members in projects
+
+    Parameters
+    ----------
+        organization_id (str): Unique identifier of the organization
+        message (str): User's request message for task assignment information
+
+    Returns
+    -------
+    Any
+        Structured result containing task assignments by team members and projects
+    """
+    result = task_assign_tool(organization_id, message)
+    return clean_result(result)
+
+def analyze_doc(organization_id: str, message: str) -> Any:
+    """
+    Analyze document content and provide AI-powered summary and insights
+
+    Parameters
+    ----------
+        organization_id (str): Unique identifier of the organization
+        message (str): User's request message specifying which document to analyze
+
+    Returns
+    -------
+    Any
+        Structured result containing document analysis and AI-generated summary
+    """
+    result = analyze_doc_tool(organization_id, message)
+    return clean_result(result)
+
+def get_project_issues(organization_id: str, message: str) -> Any:
+    """
+    Retrieve all issues/tasks from projects within an organization
+
+    Parameters
+    ----------
+        organization_id (str): Unique identifier of the organization
+        message (str): User's request message for project issues information
+
+    Returns
+    -------
+    Any
+        Structured result containing issues/tasks from all projects
+    """
+    result = get_project_issues_tool(organization_id, message)
+    return clean_result(result)
+
+def progress_reporting(organization_id: str, message: str) -> Any:
+    """
+    Generate comprehensive progress reports for projects in an organization
+
+    Parameters
+    ----------
+        organization_id (str): Unique identifier of the organization
+        message (str): User's request message for progress reporting
+
+    Returns
+    -------
+    Any
+        Structured result containing detailed progress reports for all projects
+    """
+    result = progress_reporting_tool(organization_id, message)
+    return clean_result(result)
+
+def milestone_tracking(organization_id: str, message: str) -> Any:
+    """
+    Track and analyze project milestones and key achievements
+
+    Parameters
+    ----------
+        organization_id (str): Unique identifier of the organization
+        message (str): User's request message for milestone tracking
+
+    Returns
+    -------
+    Any
+        Structured result containing milestone tracking data and analysis
+    """
+    result = milestone_tracking_tool(organization_id, message)
+    return clean_result(result)
     
 port = int(os.environ.get("PORT", 10000))
 
@@ -124,6 +232,14 @@ mcp.add_tool(pull_projects)
 mcp.add_tool(pull_documents)
 mcp.add_tool(pull_members)
 # mcp.add_tool(mail_to)
+
+# Add new tools
+mcp.add_tool(get_documents_by_projects)
+mcp.add_tool(task_assign)
+mcp.add_tool(analyze_doc)
+mcp.add_tool(get_project_issues)
+mcp.add_tool(progress_reporting)
+mcp.add_tool(milestone_tracking)
 
 if __name__ == "__main__":
     print(f"Starting MCP server on 0.0.0.0:{port}")
