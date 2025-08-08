@@ -234,12 +234,12 @@ mcp.add_tool(pull_members)
 # mcp.add_tool(mail_to)
 
 # Add new tools
-mcp.add_tool(get_documents_by_projects)
-mcp.add_tool(task_assign)
-mcp.add_tool(analyze_doc)
-mcp.add_tool(get_project_issues)
-mcp.add_tool(progress_reporting)
-mcp.add_tool(milestone_tracking)
+# mcp.add_tool(get_documents_by_projects)
+# mcp.add_tool(task_assign)
+# mcp.add_tool(analyze_doc)
+# mcp.add_tool(get_project_issues)
+# mcp.add_tool(progress_reporting)
+# mcp.add_tool(milestone_tracking)
 
 if __name__ == "__main__":
     print(f"Starting MCP server on 0.0.0.0:{port}")
