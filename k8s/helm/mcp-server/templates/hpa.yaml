@@ -1,0 +1,93 @@
+{{/*
+Horizontal Pod Autoscaler for MCP Server
+*/}}
+{{- if .Values.mcpServer.autoscaling.enabled }}
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: {{ include "mcp-server.fullname" . }}
+  labels:
+    {{- include "mcp-server.labels" . | nindent 4 }}
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: {{ include "mcp-server.fullname" . }}
+  minReplicas: {{ .Values.mcpServer.autoscaling.minReplicas }}
+  maxReplicas: {{ .Values.mcpServer.autoscaling.maxReplicas }}
+  metrics:
+    {{- if .Values.mcpServer.autoscaling.targetCPUUtilizationPercentage }}
+    - type: Resource
+      resource:
+        name: cpu
+        target:
+          type: Utilization
+          averageUtilization: {{ .Values.mcpServer.autoscaling.targetCPUUtilizationPercentage }}
+    {{- end }}
+    {{- if .Values.mcpServer.autoscaling.targetMemoryUtilizationPercentage }}
+    - type: Resource
+      resource:
+        name: memory
+        target:
+          type: Utilization
+          averageUtilization: {{ .Values.mcpServer.autoscaling.targetMemoryUtilizationPercentage }}
+    {{- end }}
+  {{- if .Values.mcpServer.autoscaling.behavior }}
+  behavior:
+    {{- toYaml .Values.mcpServer.autoscaling.behavior | nindent 4 }}
+  {{- end }}
+{{- end }}
+
+{{- if .Values.mcpServer.vpa.enabled }}
+---
+{{/*
+Vertical Pod Autoscaler for MCP Server
+*/}}
+apiVersion: autoscaling.k8s.io/v1
+kind: VerticalPodAutoscaler
+metadata:
+  name: {{ include "mcp-server.fullname" . }}-vpa
+  labels:
+    {{- include "mcp-server.labels" . | nindent 4 }}
+spec:
+  targetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: {{ include "mcp-server.fullname" . }}
+  updatePolicy:
+    updateMode: {{ .Values.mcpServer.vpa.updateMode | quote }}
+  resourcePolicy:
+    containerPolicies:
+    - containerName: {{ .Chart.Name }}
+      maxAllowed:
+        cpu: 2
+        memory: 4Gi
+      minAllowed:
+        cpu: 100m
+        memory: 128Mi
+      controlledResources: ["cpu", "memory"]
+      controlledValues: RequestsAndLimits
+{{- end }}
+
+{{- if .Values.mcpServer.podDisruptionBudget.enabled }}
+---
+{{/*
+Pod Disruption Budget for MCP Server
+*/}}
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: {{ include "mcp-server.fullname" . }}
+  labels:
+    {{- include "mcp-server.labels" . | nindent 4 }}
+spec:
+  {{- if .Values.mcpServer.podDisruptionBudget.minAvailable }}
+  minAvailable: {{ .Values.mcpServer.podDisruptionBudget.minAvailable }}
+  {{- end }}
+  {{- if .Values.mcpServer.podDisruptionBudget.maxUnavailable }}
+  maxUnavailable: {{ .Values.mcpServer.podDisruptionBudget.maxUnavailable }}
+  {{- end }}
+  selector:
+    matchLabels:
+      {{- include "mcp-server.selectorLabels" . | nindent 6 }}
+{{- end }}

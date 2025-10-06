@@ -1,0 +1,114 @@
+{{/*
+MCP Server Deployment
+*/}}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "mcp-server.fullname" . }}
+  labels:
+    {{- include "mcp-server.labels" . | nindent 4 }}
+  annotations:
+    deployment.kubernetes.io/revision: "{{ .Release.Revision }}"
+spec:
+  {{- if not .Values.mcpServer.autoscaling.enabled }}
+  replicas: {{ .Values.mcpServer.replicaCount }}
+  {{- end }}
+  strategy:
+    {{- toYaml .Values.mcpServer.strategy | nindent 4 }}
+  selector:
+    matchLabels:
+      {{- include "mcp-server.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      annotations:
+        checksum/config: {{ include (print $.Template.BasePath "/configmap.yaml") . | sha256sum }}
+        checksum/secret: {{ include (print $.Template.BasePath "/secret.yaml") . | sha256sum }}
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "{{ .Values.mcpServer.containerPort }}"
+        prometheus.io/path: "/metrics"
+      labels:
+        {{- include "mcp-server.selectorLabels" . | nindent 8 }}
+        version: {{ .Values.mcpServer.image.tag | quote }}
+    spec:
+      {{- with .Values.global.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      serviceAccountName: {{ include "mcp-server.serviceAccountName" . }}
+      securityContext:
+        {{- toYaml .Values.mcpServer.podSecurityContext | nindent 8 }}
+      containers:
+        - name: {{ .Chart.Name }}
+          securityContext:
+            {{- toYaml .Values.mcpServer.containerSecurityContext | nindent 12 }}
+          image: "{{ .Values.global.imageRegistry | default .Values.mcpServer.image.registry }}/{{ .Values.mcpServer.image.repository }}:{{ .Values.mcpServer.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.mcpServer.image.pullPolicy }}
+          {{- if .Values.mcpServer.command }}
+          command:
+            {{- toYaml .Values.mcpServer.command | nindent 12 }}
+          {{- end }}
+          {{- if .Values.mcpServer.args }}
+          args:
+            {{- toYaml .Values.mcpServer.args | nindent 12 }}
+          {{- end }}
+          ports:
+            - name: http
+              containerPort: {{ .Values.mcpServer.containerPort }}
+              protocol: TCP
+            - name: metrics
+              containerPort: 8080
+              protocol: TCP
+          env:
+            {{- range $key, $value := .Values.mcpServer.env }}
+            - name: {{ $key }}
+              value: {{ $value | quote }}
+            {{- end }}
+            - name: POD_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
+            - name: POD_NAMESPACE
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.namespace
+            - name: NODE_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: spec.nodeName
+          {{- if .Values.mcpServer.envFrom }}
+          envFrom:
+            {{- toYaml .Values.mcpServer.envFrom | nindent 12 }}
+          {{- end }}
+          {{- if .Values.mcpServer.livenessProbe.enabled }}
+          livenessProbe:
+            {{- omit .Values.mcpServer.livenessProbe "enabled" | toYaml | nindent 12 }}
+          {{- end }}
+          {{- if .Values.mcpServer.readinessProbe.enabled }}
+          readinessProbe:
+            {{- omit .Values.mcpServer.readinessProbe "enabled" | toYaml | nindent 12 }}
+          {{- end }}
+          {{- if .Values.mcpServer.startupProbe.enabled }}
+          startupProbe:
+            {{- omit .Values.mcpServer.startupProbe "enabled" | toYaml | nindent 12 }}
+          {{- end }}
+          resources:
+            {{- toYaml .Values.mcpServer.resources | nindent 12 }}
+          volumeMounts:
+            {{- toYaml .Values.mcpServer.volumeMounts | nindent 12 }}
+      volumes:
+        {{- toYaml .Values.mcpServer.volumes | nindent 8 }}
+      {{- with .Values.mcpServer.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.mcpServer.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.mcpServer.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      terminationGracePeriodSeconds: 30
+      dnsPolicy: ClusterFirst
+      restartPolicy: Always

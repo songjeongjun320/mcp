@@ -1,0 +1,79 @@
+{{/*
+MCP Server Service
+*/}}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "mcp-server.fullname" . }}
+  labels:
+    {{- include "mcp-server.labels" . | nindent 4 }}
+  {{- with .Values.service.annotations }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+spec:
+  type: {{ .Values.service.type }}
+  ports:
+    - port: {{ .Values.service.port }}
+      targetPort: {{ .Values.service.targetPort }}
+      protocol: TCP
+      name: http
+  selector:
+    {{- include "mcp-server.selectorLabels" . | nindent 4 }}
+
+---
+{{/*
+Headless Service for StatefulSet scenarios
+*/}}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "mcp-server.fullname" . }}-headless
+  labels:
+    {{- include "mcp-server.labels" . | nindent 4 }}
+    service.type: headless
+spec:
+  type: ClusterIP
+  clusterIP: None
+  ports:
+    - port: {{ .Values.service.port }}
+      targetPort: {{ .Values.service.targetPort }}
+      protocol: TCP
+      name: http
+    - port: 8080
+      targetPort: metrics
+      protocol: TCP
+      name: metrics
+  selector:
+    {{- include "mcp-server.selectorLabels" . | nindent 4 }}
+
+{{- if .Values.loadBalancer.enabled }}
+---
+{{/*
+Load Balancer Service for Cloud Provider Integration
+*/}}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "mcp-server.fullname" . }}-lb
+  labels:
+    {{- include "mcp-server.labels" . | nindent 4 }}
+    service.type: loadbalancer
+  {{- with .Values.loadBalancer.annotations }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+spec:
+  type: LoadBalancer
+  ports:
+    - port: 80
+      targetPort: {{ .Values.service.targetPort }}
+      protocol: TCP
+      name: http
+    - port: 443
+      targetPort: {{ .Values.service.targetPort }}
+      protocol: TCP
+      name: https
+  selector:
+    {{- include "mcp-server.selectorLabels" . | nindent 4 }}
+{{- end }}

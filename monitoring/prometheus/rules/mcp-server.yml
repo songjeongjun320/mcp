@@ -1,0 +1,158 @@
+# Prometheus alerting rules for MCP Server
+groups:
+  - name: mcp-server.rules
+    rules:
+      # High-level availability alerts
+      - alert: MCPServerDown
+        expr: up{job="mcp-server"} == 0
+        for: 1m
+        labels:
+          severity: critical
+          service: mcp-server
+        annotations:
+          summary: "MCP Server instance is down"
+          description: "MCP Server instance {{ $labels.instance }} has been down for more than 1 minute."
+          runbook_url: "https://docs.mcp.com/runbooks/server-down"
+
+      - alert: MCPServerHighErrorRate
+        expr: |
+          (
+            rate(mcp_http_requests_total{status=~"5.."}[5m]) /
+            rate(mcp_http_requests_total[5m])
+          ) * 100 > 5
+        for: 5m
+        labels:
+          severity: warning
+          service: mcp-server
+        annotations:
+          summary: "MCP Server high error rate"
+          description: "MCP Server error rate is {{ $value }}% which is above the threshold of 5%."
+
+      # Performance alerts
+      - alert: MCPServerHighLatency
+        expr: |
+          histogram_quantile(0.95, 
+            rate(mcp_http_request_duration_seconds_bucket[5m])
+          ) > 0.5
+        for: 5m
+        labels:
+          severity: warning
+          service: mcp-server
+        annotations:
+          summary: "MCP Server high latency"
+          description: "MCP Server 95th percentile latency is {{ $value }}s which is above 0.5s."
+
+      - alert: MCPServerHighMemoryUsage
+        expr: |
+          (
+            container_memory_usage_bytes{name="mcp-server"} /
+            container_spec_memory_limit_bytes{name="mcp-server"}
+          ) * 100 > 80
+        for: 10m
+        labels:
+          severity: warning
+          service: mcp-server
+        annotations:
+          summary: "MCP Server high memory usage"
+          description: "MCP Server memory usage is {{ $value }}% which is above 80%."
+
+      - alert: MCPServerHighCPUUsage
+        expr: |
+          (
+            rate(container_cpu_usage_seconds_total{name="mcp-server"}[5m]) /
+            container_spec_cpu_quota{name="mcp-server"} * 
+            container_spec_cpu_period{name="mcp-server"}
+          ) * 100 > 80
+        for: 10m
+        labels:
+          severity: warning
+          service: mcp-server
+        annotations:
+          summary: "MCP Server high CPU usage"
+          description: "MCP Server CPU usage is {{ $value }}% which is above 80%."
+
+      # Business logic alerts
+      - alert: MCPServerLowTraceabilityOperations
+        expr: |
+          rate(mcp_traceability_operations_total[1h]) < 10
+        for: 30m
+        labels:
+          severity: info
+          service: mcp-server
+        annotations:
+          summary: "Low traceability operations"
+          description: "MCP Server traceability operations rate is {{ $value }} ops/hour, which is unusually low."
+
+      - alert: MCPServerDatabaseConnectionIssues
+        expr: |
+          rate(mcp_database_connection_errors_total[5m]) > 0.1
+        for: 2m
+        labels:
+          severity: critical
+          service: mcp-server
+        annotations:
+          summary: "Database connection issues"
+          description: "MCP Server is experiencing database connection errors at {{ $value }} errors/sec."
+
+      # Infrastructure alerts
+      - alert: MCPServerPodCrashLooping
+        expr: |
+          rate(kube_pod_container_status_restarts_total{container="mcp-server"}[5m]) * 60 * 5 > 1
+        for: 5m
+        labels:
+          severity: warning
+          service: mcp-server
+        annotations:
+          summary: "MCP Server pod crash looping"
+          description: "MCP Server pod {{ $labels.pod }} is crash looping with {{ $value }} restarts in the last 5 minutes."
+
+      - alert: MCPServerInsufficientReplicas
+        expr: |
+          kube_deployment_status_replicas_available{deployment="mcp-server"} < 2
+        for: 5m
+        labels:
+          severity: warning
+          service: mcp-server
+        annotations:
+          summary: "Insufficient MCP Server replicas"
+          description: "Only {{ $value }} MCP Server replicas are available, which is below the minimum of 2."
+
+  - name: mcp-server-slo.rules
+    rules:
+      # SLI calculations
+      - record: mcp_server:availability:5m
+        expr: |
+          avg_over_time(up{job="mcp-server"}[5m])
+
+      - record: mcp_server:error_rate:5m
+        expr: |
+          rate(mcp_http_requests_total{status=~"5.."}[5m]) /
+          rate(mcp_http_requests_total[5m])
+
+      - record: mcp_server:latency_p95:5m
+        expr: |
+          histogram_quantile(0.95, 
+            rate(mcp_http_request_duration_seconds_bucket[5m])
+          )
+
+      - record: mcp_server:latency_p99:5m
+        expr: |
+          histogram_quantile(0.99, 
+            rate(mcp_http_request_duration_seconds_bucket[5m])
+          )
+
+      # SLO burn rate alerts (based on Google SRE practices)
+      - alert: MCPServerErrorBudgetBurnRateTooHigh
+        expr: |
+          (
+            mcp_server:error_rate:5m > (14.4 * (1 - 0.999)) and
+            mcp_server:error_rate:5m > (6 * (1 - 0.999))
+          )
+        for: 2m
+        labels:
+          severity: critical
+          service: mcp-server
+          slo: availability
+        annotations:
+          summary: "MCP Server error budget burn rate too high"
+          description: "Error budget is being consumed at {{ $value }}x the acceptable rate."
