@@ -65,7 +65,7 @@ mcp_server:
     # ===================================================================
 
     - tool_name: traceability_get_all_trees
-      tool_description: "**RECOMMENDED** Get ALL projects' requirement traceability hierarchies for an organization at once. Shows parent-child relationships, depth levels, and complete hierarchy paths for every project. Use this to see the complete traceability picture across all projects."
+      tool_description: "**RECOMMENDED** Get ALL projects' requirement traceability hierarchies for an organization at once. Shows parent-child relationships, depth levels, and complete hierarchy paths for every project. Use this to see the complete traceability picture across all projects. NOTE: If you don't have organization_id, use pull_projects first to get it."
       tool_args:
         - arg_variable: "organization_id"
           arg_type: string
@@ -75,7 +75,7 @@ mcp_server:
           arg_description: "Include statistics (total nodes, root nodes, max depth) - default: true"
 
     - tool_name: traceability_get_tree
-      tool_description: "Get complete requirement traceability hierarchy tree for a SINGLE project. Shows parent-child relationships, depth levels, and full hierarchy path for all requirements in the specified project."
+      tool_description: "Get complete requirement traceability hierarchy tree for a SINGLE project. Shows parent-child relationships, depth levels, and full hierarchy path for all requirements in the specified project. NOTE: If you don't have project_id, use pull_projects first to get it."
       tool_args:
         - arg_variable: "project_id"
           arg_type: string
