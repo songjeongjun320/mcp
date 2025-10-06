@@ -5,10 +5,9 @@ from tools.pull_projects_tool import pull_projects_tool
 from tools.pull_documents_tool import pull_documents_tool
 from tools.pull_members_tool import pull_members_tool
 from tools.mail_to_tool import mail_to_tool
-from tools.traceability_validate_cycle_tool import traceability_validate_cycle_tool
 from tools.traceability_query_hierarchy_tool import traceability_query_hierarchy_tool
-from tools.traceability_search_for_linking_tool import traceability_search_for_linking_tool
-from tools.traceability_generate_matrix_tool import traceability_generate_matrix_tool
+from tools.traceability_get_tree_tool import traceability_get_tree_tool
+from tools.traceability_get_all_trees_tool import traceability_get_all_trees_tool
 from mcp.server.fastmcp import FastMCP
 from dotenv import load_dotenv
 
@@ -145,35 +144,6 @@ def mail_to(organization_id: str, message: str):
 #     result = milestone_tracking_tool(organization_id, message)
 #     return clean_result(result)
 
-def traceability_validate_cycle(
-    organization_id: str,
-    ancestor_id: str,
-    descendant_id: str,
-    max_depth: int = 100
-) -> Any:
-    """
-    Validate if creating a requirement relationship would cause a cycle.
-    Use this before creating parent-child relationships to prevent circular dependencies.
-
-    Parameters
-    ----------
-        organization_id (str): User's individual organization_id
-        ancestor_id (str): UUID of the proposed parent requirement
-        descendant_id (str): UUID of the proposed child requirement
-        max_depth (int): Maximum depth to check for cycles (default: 100)
-
-    Returns
-    -------
-    Any
-        {
-            success: bool,
-            would_create_cycle: bool,
-            cycle_path: list | None,
-            error: str | None
-        }
-    """
-    result = traceability_validate_cycle_tool(organization_id, ancestor_id, descendant_id, max_depth)
-    return clean_result(result)
 
 def traceability_query_hierarchy(
     organization_id: str,
@@ -210,77 +180,84 @@ def traceability_query_hierarchy(
     )
     return clean_result(result)
 
-def traceability_search_for_linking(
-    organization_id: str,
-    project_id: str = None,
-    document_id: str = None,
-    search_query: str = None,
-    max_results: int = 100
+
+def traceability_get_tree(
+    project_id: str,
+    include_metadata: bool = True
 ) -> Any:
     """
-    Search for requirements available for linking with filtering options.
-    Use this to find requirements that can be linked together.
+    Get the complete hierarchical tree view for a SINGLE project.
+
+    Shows parent-child relationships, depth levels, and full hierarchy path
+    for all requirements in the specified project.
 
     Parameters
     ----------
-        organization_id (str): User's individual organization_id
-        project_id (str): Optional project ID to scope the search
-        document_id (str): Optional document ID to scope the search
-        search_query (str): Optional text search in requirement names/descriptions
-        max_results (int): Maximum number of results (default: 100)
+        project_id (str): UUID of the project to get tree for
+        include_metadata (bool): Include statistics (total nodes, root nodes, max depth)
 
     Returns
     -------
     Any
         {
             success: bool,
-            requirements: list,
-            pagination: dict,
+            tree: list[{
+                requirement_id: str,
+                title: str,
+                parent_id: str | None,
+                depth: int,
+                path: str,
+                has_children: bool
+            }],
+            hierarchy_view: list[str],
+            metadata: dict | None,
             error: str | None
         }
     """
-    result = traceability_search_for_linking_tool(
-        organization_id=organization_id,
-        project_id=project_id,
-        document_id=document_id,
-        search_query=search_query,
-        max_results=max_results
-    )
+    result = traceability_get_tree_tool(project_id, include_metadata)
     return clean_result(result)
 
-def traceability_generate_matrix(
+def traceability_get_all_trees(
     organization_id: str,
-    project_id: str,
-    include_documents: bool = True,
-    include_orphans: bool = True
+    include_metadata: bool = True
 ) -> Any:
     """
-    Generate a comprehensive traceability matrix for a project.
-    Shows all requirements, their relationships, and coverage statistics.
+    **RECOMMENDED** Get ALL projects' traceability trees for an organization.
+
+    This is the most convenient way to see all traceability hierarchies at once.
+    Returns trees for every project in the organization.
+
+    Use this when you want to see the complete traceability picture across
+    all projects, instead of querying each project individually.
 
     Parameters
     ----------
-        organization_id (str): User's individual organization_id
-        project_id (str): UUID of the project to analyze
-        include_documents (bool): Include document information (default: True)
-        include_orphans (bool): Include requirements with no links (default: True)
+        organization_id (str): User's organization ID
+        include_metadata (bool): Include statistics for each project
 
     Returns
     -------
     Any
         {
             success: bool,
-            matrix: {
-                requirements: list,
-                relationships: list,
-                statistics: dict
+            organization_id: str,
+            projects: list[{
+                project_id: str,
+                project_name: str,
+                tree: list[...],
+                hierarchy_view: list[str],
+                metadata: dict
+            }],
+            summary: {
+                total_projects: int,
+                total_requirements: int,
+                total_relationships: int,
+                query_time_ms: int
             },
             error: str | None
         }
     """
-    result = traceability_generate_matrix_tool(
-        organization_id, project_id, include_documents, include_orphans
-    )
+    result = traceability_get_all_trees_tool(organization_id, include_metadata)
     return clean_result(result)
     
 port = int(os.environ.get("PORT", 10000))
@@ -301,10 +278,9 @@ mcp.add_tool(pull_members)
 # mcp.add_tool(milestone_tracking)
 
 # Add traceability tools
-mcp.add_tool(traceability_validate_cycle)
-mcp.add_tool(traceability_query_hierarchy)
-mcp.add_tool(traceability_search_for_linking)
-mcp.add_tool(traceability_generate_matrix)
+mcp.add_tool(traceability_get_all_trees)  # RECOMMENDED - get all projects at once
+mcp.add_tool(traceability_get_tree)  # Get single project tree
+mcp.add_tool(traceability_query_hierarchy)  # Query specific requirement relationships
 
 if __name__ == "__main__":
     print(f"Starting MCP server on 0.0.0.0:{port}")
