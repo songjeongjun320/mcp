@@ -59,3 +59,46 @@ mcp_server:
         - arg_variable: "message"
           arg_type: string
           arg_description: "user's request message"
+
+    # ===================================================================
+    # Traceability Tools - Requirement Hierarchy Analysis
+    # ===================================================================
+
+    - tool_name: traceability_get_all_trees
+      tool_description: "**RECOMMENDED** Get ALL projects' requirement traceability hierarchies for an organization at once. Shows parent-child relationships, depth levels, and complete hierarchy paths for every project. Use this to see the complete traceability picture across all projects."
+      tool_args:
+        - arg_variable: "organization_id"
+          arg_type: string
+          arg_description: "Organization ID to get all project trees for"
+        - arg_variable: "include_metadata"
+          arg_type: boolean
+          arg_description: "Include statistics (total nodes, root nodes, max depth) - default: true"
+
+    - tool_name: traceability_get_tree
+      tool_description: "Get complete requirement traceability hierarchy tree for a SINGLE project. Shows parent-child relationships, depth levels, and full hierarchy path for all requirements in the specified project."
+      tool_args:
+        - arg_variable: "project_id"
+          arg_type: string
+          arg_description: "UUID of the project to get tree for"
+        - arg_variable: "include_metadata"
+          arg_type: boolean
+          arg_description: "Include statistics (total nodes, root nodes, max depth) - default: true"
+
+    - tool_name: traceability_query_hierarchy
+      tool_description: "Query hierarchical relationships (ancestors/descendants) for a specific requirement. Useful for understanding a particular requirement's dependencies and structure."
+      tool_args:
+        - arg_variable: "organization_id"
+          arg_type: string
+          arg_description: "Organization ID for access control"
+        - arg_variable: "requirement_id"
+          arg_type: string
+          arg_description: "UUID of the requirement to query relationships for"
+        - arg_variable: "direction"
+          arg_type: string
+          arg_description: "Query direction: 'ancestors', 'descendants', or 'both' - default: 'both'"
+        - arg_variable: "max_depth"
+          arg_type: integer
+          arg_description: "Maximum depth to traverse - default: 10"
+        - arg_variable: "include_metadata"
+          arg_type: boolean
+          arg_description: "Include timing and count metadata - default: true"
