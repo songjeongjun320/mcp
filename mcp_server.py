@@ -5,12 +5,10 @@ from tools.pull_projects_tool import pull_projects_tool
 from tools.pull_documents_tool import pull_documents_tool
 from tools.pull_members_tool import pull_members_tool
 from tools.mail_to_tool import mail_to_tool
-from tools.get_documents_by_projects_tool import get_documents_by_projects_tool
-from tools.task_assign_tool import task_assign_tool
-from tools.analyze_doc_tool import analyze_doc_tool
-from tools.get_project_issues_tool import get_project_issues_tool
-from tools.progress_reporting_tool import progress_reporting_tool
-from tools.milestone_tracking_tool import milestone_tracking_tool
+from tools.traceability_validate_cycle_tool import traceability_validate_cycle_tool
+from tools.traceability_query_hierarchy_tool import traceability_query_hierarchy_tool
+from tools.traceability_search_for_linking_tool import traceability_search_for_linking_tool
+from tools.traceability_generate_matrix_tool import traceability_generate_matrix_tool
 from mcp.server.fastmcp import FastMCP
 from dotenv import load_dotenv
 
@@ -122,106 +120,167 @@ def mail_to(organization_id: str, message: str):
     """
     return mail_to_tool(organization_id, message)
 
-def get_documents_by_projects(organization_id: str, message: str) -> Any:
+# Commented out - tool files not present
+# def get_documents_by_projects(organization_id: str, message: str) -> Any:
+#     result = get_documents_by_projects_tool(organization_id, message)
+#     return clean_result(result)
+
+# def task_assign(organization_id: str, message: str) -> Any:
+#     result = task_assign_tool(organization_id, message)
+#     return clean_result(result)
+
+# def analyze_doc(organization_id: str, message: str) -> Any:
+#     result = analyze_doc_tool(organization_id, message)
+#     return clean_result(result)
+
+# def get_project_issues(organization_id: str, message: str) -> Any:
+#     result = get_project_issues_tool(organization_id, message)
+#     return clean_result(result)
+
+# def progress_reporting(organization_id: str, message: str) -> Any:
+#     result = progress_reporting_tool(organization_id, message)
+#     return clean_result(result)
+
+# def milestone_tracking(organization_id: str, message: str) -> Any:
+#     result = milestone_tracking_tool(organization_id, message)
+#     return clean_result(result)
+
+def traceability_validate_cycle(
+    organization_id: str,
+    ancestor_id: str,
+    descendant_id: str,
+    max_depth: int = 100
+) -> Any:
     """
-    Get documents from specific projects within an organization
+    Validate if creating a requirement relationship would cause a cycle.
+    Use this before creating parent-child relationships to prevent circular dependencies.
 
     Parameters
     ----------
-        organization_id (str): User's individual organization_id. Get this from mcp.json.
-        message (str): User's request message containing project specifications
+        organization_id (str): User's individual organization_id
+        ancestor_id (str): UUID of the proposed parent requirement
+        descendant_id (str): UUID of the proposed child requirement
+        max_depth (int): Maximum depth to check for cycles (default: 100)
 
     Returns
     -------
     Any
-        Structured result containing documents from specified projects
+        {
+            success: bool,
+            would_create_cycle: bool,
+            cycle_path: list | None,
+            error: str | None
+        }
     """
-    result = get_documents_by_projects_tool(organization_id, message)
+    result = traceability_validate_cycle_tool(organization_id, ancestor_id, descendant_id, max_depth)
     return clean_result(result)
 
-def task_assign(organization_id: str, message: str) -> Any:
+def traceability_query_hierarchy(
+    organization_id: str,
+    requirement_id: str,
+    direction: str = "both",
+    max_depth: int = 10,
+    include_metadata: bool = True
+) -> Any:
     """
-    Retrieve task assignments for team members in projects
+    Query hierarchical relationships (ancestors/descendants) for a requirement.
+    Useful for understanding requirement dependencies and structure.
 
     Parameters
     ----------
-        organization_id (str): User's individual organization_id. Get this from mcp.json.
-        message (str): User's request message for task assignment information
+        organization_id (str): User's individual organization_id
+        requirement_id (str): UUID of the requirement to query
+        direction (str): 'ancestors', 'descendants', or 'both' (default: 'both')
+        max_depth (int): Maximum depth to traverse (default: 10)
+        include_metadata (bool): Include timing and count metadata (default: True)
 
     Returns
     -------
     Any
-        Structured result containing task assignments by team members and projects
+        {
+            success: bool,
+            requirement: dict,
+            relationships: list,
+            metadata: dict | None,
+            error: str | None
+        }
     """
-    result = task_assign_tool(organization_id, message)
+    result = traceability_query_hierarchy_tool(
+        organization_id, requirement_id, direction, max_depth, include_metadata
+    )
     return clean_result(result)
 
-def analyze_doc(organization_id: str, message: str) -> Any:
+def traceability_search_for_linking(
+    organization_id: str,
+    project_id: str = None,
+    document_id: str = None,
+    search_query: str = None,
+    max_results: int = 100
+) -> Any:
     """
-    Analyze document content and provide AI-powered summary and insights
+    Search for requirements available for linking with filtering options.
+    Use this to find requirements that can be linked together.
 
     Parameters
     ----------
-        organization_id (str): User's individual organization_id. Get this from mcp.json.
-        message (str): User's request message specifying which document to analyze
+        organization_id (str): User's individual organization_id
+        project_id (str): Optional project ID to scope the search
+        document_id (str): Optional document ID to scope the search
+        search_query (str): Optional text search in requirement names/descriptions
+        max_results (int): Maximum number of results (default: 100)
 
     Returns
     -------
     Any
-        Structured result containing document analysis and AI-generated summary
+        {
+            success: bool,
+            requirements: list,
+            pagination: dict,
+            error: str | None
+        }
     """
-    result = analyze_doc_tool(organization_id, message)
+    result = traceability_search_for_linking_tool(
+        organization_id=organization_id,
+        project_id=project_id,
+        document_id=document_id,
+        search_query=search_query,
+        max_results=max_results
+    )
     return clean_result(result)
 
-def get_project_issues(organization_id: str, message: str) -> Any:
+def traceability_generate_matrix(
+    organization_id: str,
+    project_id: str,
+    include_documents: bool = True,
+    include_orphans: bool = True
+) -> Any:
     """
-    Retrieve all issues/tasks from projects within an organization
+    Generate a comprehensive traceability matrix for a project.
+    Shows all requirements, their relationships, and coverage statistics.
 
     Parameters
     ----------
-        organization_id (str): User's individual organization_id. Get this from mcp.json.
-        message (str): User's request message for project issues information
+        organization_id (str): User's individual organization_id
+        project_id (str): UUID of the project to analyze
+        include_documents (bool): Include document information (default: True)
+        include_orphans (bool): Include requirements with no links (default: True)
 
     Returns
     -------
     Any
-        Structured result containing issues/tasks from all projects
+        {
+            success: bool,
+            matrix: {
+                requirements: list,
+                relationships: list,
+                statistics: dict
+            },
+            error: str | None
+        }
     """
-    result = get_project_issues_tool(organization_id, message)
-    return clean_result(result)
-
-def progress_reporting(organization_id: str, message: str) -> Any:
-    """
-    Generate comprehensive progress reports for projects in an organization
-
-    Parameters
-    ----------
-        organization_id (str): User's individual organization_id. Get this from mcp.json.
-        message (str): User's request message for progress reporting
-
-    Returns
-    -------
-    Any
-        Structured result containing detailed progress reports for all projects
-    """
-    result = progress_reporting_tool(organization_id, message)
-    return clean_result(result)
-
-def milestone_tracking(organization_id: str, message: str) -> Any:
-    """
-    Track and analyze project milestones and key achievements
-
-    Parameters
-    ----------
-        organization_id (str): User's individual organization_id. Get this from mcp.json.
-        message (str): User's request message for milestone tracking
-
-    Returns
-    -------
-    Any
-        Structured result containing milestone tracking data and analysis
-    """
-    result = milestone_tracking_tool(organization_id, message)
+    result = traceability_generate_matrix_tool(
+        organization_id, project_id, include_documents, include_orphans
+    )
     return clean_result(result)
     
 port = int(os.environ.get("PORT", 10000))
@@ -240,6 +299,12 @@ mcp.add_tool(pull_members)
 # mcp.add_tool(get_project_issues)
 # mcp.add_tool(progress_reporting)
 # mcp.add_tool(milestone_tracking)
+
+# Add traceability tools
+mcp.add_tool(traceability_validate_cycle)
+mcp.add_tool(traceability_query_hierarchy)
+mcp.add_tool(traceability_search_for_linking)
+mcp.add_tool(traceability_generate_matrix)
 
 if __name__ == "__main__":
     print(f"Starting MCP server on 0.0.0.0:{port}")
